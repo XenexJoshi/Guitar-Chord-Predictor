@@ -2,6 +2,7 @@ import os
 
 import json
 import librosa
+import numpy as np
 
 DATA_PATH = "jim2012Chords/Guitar_Only" # Directory name of the file containing the .wav files
 JSON_PATH = "data.json" # Filename where the encoded data is written
@@ -39,14 +40,17 @@ def generate_features(data_path, json_path, hop_length = HOP_LENGTH):
     
     for f in file_name:
       # loading an individual file
+      if f == '.DS_Store':
+        continue
       file_path = os.path.join(dir_path, f)
-      print(file_path)
       signal, sample_rate = librosa.load(file_path, sr = SAMPLE_RATE)
 
       chroma = librosa.feature.chroma_stft(y = signal, sr = sample_rate, hop_length = hop_length)
+      chroma = chroma.T
+
       data['chroma_vector'].append(chroma.tolist())
       data['labels'].append(i - 1)
-  
+
   # Accessing the json file for writing collected data
   with open(json_path, "w") as fp:
     json.dump(data, fp, indent = 4)
